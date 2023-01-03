@@ -12,6 +12,7 @@ import Footer from './Footer';
 import { format } from 'date-fns';
 import api from './api/posts';
 import useWindowSize from './hooks/useWindowSize';
+import useAxiosFetch from './hooks/useAxiosFetch';
 
 function App() {
   //const API_URL = "http://localhost:3500/posts";
@@ -27,33 +28,39 @@ function App() {
   const navigate = useNavigate();
   const { width } = useWindowSize();
 
+  const { data, fetchError, isLoading } = useAxiosFetch('http://localhost:3500/posts');
+
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        // const response = await fetch(API_URL);
-        // if (!response.ok) throw Error("Please Reload the Page");
-        // const result = await response.json();
-        // setPosts(result);
+    setPosts(data);
+  }, [data]);
 
-        const response = await api.get('/posts');
-        setPosts(response.data);
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     try {
+  //       // const response = await fetch(API_URL);
+  //       // if (!response.ok) throw Error("Please Reload the Page");
+  //       // const result = await response.json();
+  //       // setPosts(result);
 
-      } catch (err) {
-        //console.log(err);
+  //       const response = await api.get('/posts');
+  //       setPosts(response.data);
 
-        if (err.response) {
-          console.log(err.response.data);
-          console.log(err.response.status);
-          console.log(err.response.headers);
-        } else {
-          console.log(`Error: ${err.message}`);
-        }
-      }
-    }
+  //     } catch (err) {
+  //       //console.log(err);
 
-    //(async () => await fetchPosts())();
-    fetchPosts();
-  }, []);
+  //       if (err.response) {
+  //         console.log(err.response.data);
+  //         console.log(err.response.status);
+  //         console.log(err.response.headers);
+  //       } else {
+  //         console.log(`Error: ${err.message}`);
+  //       }
+  //     }
+  //   }
+
+  //   //(async () => await fetchPosts())();
+  //   fetchPosts();
+  // }, []);
 
   useEffect(() => {
     const filteredResults = posts.filter(x =>
@@ -116,6 +123,8 @@ function App() {
         <Route path="/" element={
           <Home
             posts={searchResults}
+            fetchError={fetchError}
+            isLoading={isLoading}
           />
         } />
         <Route path="/post" element={
